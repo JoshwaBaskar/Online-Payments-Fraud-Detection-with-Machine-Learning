@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Payments Fraud Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <div class="logo">Online Payments <span>Fraud Detection</span></div>
+            <p class="subtitle">AI-Powered Transaction Security Analysis</p>
+        </header>
+        
+        <main class="main-content">
+            <section class="analysis-panel">
+                <h2>Transaction Details</h2>
+                <form method="POST" action="/analyze" class="transaction-form">
+                    
+                    <div class="form-group">
+                        <label for="txn_type">Transaction Type</label>
+                        <div class="select-wrapper">
+                            <select id="txn_type" name="txn_type" required>
+                                <option value="" disabled selected>Select an operation</option>
+                                <option value="CASH_OUT">Cash Out</option>
+                                <option value="PAYMENT">Payment</option>
+                                <option value="CASH_IN">Cash In</option>
+                                <option value="TRANSFER">Transfer</option>
+                                <option value="DEBIT">Debit</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">Amount ($)</label>
+                        <input type="number" step="0.01" id="amount" name="amount" placeholder="e.g. 500.00" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="old_balance">Originator Old Balance ($)</label>
+                        <input type="number" step="0.01" id="old_balance" name="old_balance" placeholder="e.g. 1000.00" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new_balance">Originator New Balance ($)</label>
+                        <input type="number" step="0.01" id="new_balance" name="new_balance" placeholder="e.g. 500.00" required>
+                    </div>
+
+                    <button type="submit" class="analyze-btn">Analyze Transaction</button>
+                </form>
+            </section>
+
+            <aside class="results-panel">
+                <h2>Analysis Result</h2>
+                <div class="result-card {% if prediction != None %}{% if prediction %}fraud{% else %}safe{% endif %}{% endif %}">
+                    {% if prediction != None %}
+                        {% if prediction %}
+                            <div class="icon-warning">⚠️</div>
+                            <h3>High Risk</h3>
+                            <p>This transaction exhibits fraudulent patterns.</p>
+                        {% else %}
+                            <div class="icon-safe">✓</div>
+                            <h3>Safe</h3>
+                            <p>This transaction appears to be legitimate.</p>
+                        {% endif %}
+                        
+                        {% if submitted_data %}
+                        <div class="txn-summary">
+                            <p><strong>Type:</strong> {{ submitted_data.type }}</p>
+                            <p><strong>Amount:</strong> ${{ "%.2f"|format(submitted_data.amount) }}</p>
+                        </div>
+                        {% endif %}
+                    {% elif error %}
+                        <div class="icon-error">❌</div>
+                        <h3>Error</h3>
+                        <p>{{ error }}</p>
+                    {% else %}
+                        <div class="icon-pending">🛡️</div>
+                        <h3>Awaiting Input</h3>
+                        <p>Submit transaction details to run the AI analysis.</p>
+                    {% endif %}
+                </div>
+            </aside>
+        </main>
+    </div>
+</body>
+</html>
